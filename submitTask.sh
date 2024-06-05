@@ -8,9 +8,7 @@ if [[ "/home/admin/mentees/$name" == "$(getent passwd $name | cut -d: -f6)" ]]; 
  echo "Not empty" > /home/admin/mentees/"$name"/"$dom"/"$taskno"
 fi 
  
-elif [[ "/home/admin/mentors/web/$name" == "$(getent passwd $name | cut -d: -f6)" || \
-        "/home/admin/mentors/app/$name" == "$(getent passwd $name | cut -d: -f6)" || \
-        "/home/admin/mentors/sysad/$name" == "$(getent passwd $name | cut -d: -f6)" ]]; then
+elif [[ "/home/admin/mentors/web/$name" == "$(getent passwd $name | cut -d: -f6)" ||  "/home/admin/mentors/app/$name" == "$(getent passwd $name | cut -d: -f6)" || "/home/admin/mentors/sysad/$name" == "$(getent passwd $name | cut -d: -f6)" ]]; then
  domain=$(basename $(dirname "$(getent passwd '$name' | cut -d: -f6)"))
  while IFS= read -r line
  do
@@ -20,8 +18,8 @@ elif [[ "/home/admin/mentors/web/$name" == "$(getent passwd $name | cut -d: -f6)
   for tasks in /home/admin/mentees/"$name1"/"$domain"/task{1..3}; do
    if [[ -d "$tasks" && $(ls -A "$tasks") ]]; then
     task_no="$count"
-    sudo sed -i -E "/^\s*$domain:/,/^\s*$/ s/Task$task_no:.*/Task$task_no: y/" /home/admin/mentees/"$name1"/task_completed.txt
-    sudo ln -sf "$tasks" "/home/admin/mentors/$domain/$name/submittedTasks/$task_no/$name1"
+    sed -i -E "/^\s*$domain:/,/^\s*$/ s/Task$task_no:.*/Task$task_no: y/" /home/admin/mentees/"$name1"/task_completed.txt
+    ln -sf "$tasks" "/home/admin/mentors/$domain/$name/submittedTasks/$task_no/$name1"
    fi
    (( count += 1))
   done

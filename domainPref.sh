@@ -24,11 +24,11 @@ name=$(whoami)
    echo "'$name' '$rollno' '${values[0]}'=>'${values[1]}'=>'${values[2]}'" >>/home/admin/mentees_domain.txt
    echo "'$values[0]}'=>'${values[1]}'=>'$values[2]}'" > /home/admin/mentees/"$name"/domain_pref.txt
    if [ -n "${values[0]}" ]; then
-    sudo mkdir /home/admin/mentees/"$name"/"${values[0]}"
+    mkdir /home/admin/mentees/"$name"/"${values[0]}"
    fi
    if [ -n "${values[1]}" ]; then
-    sudo mkdir /home/admin/mentees/"$name"/"${values[1]}"
+    mkdir /home/admin/mentees/"$name"/"${values[1]}"
    fi
    if [ -n "${values[2]}" ]; then
-    sudo  mkdir /home/admin/mentees/"$name"/"${values[2]}"
+    mkdir /home/admin/mentees/"$name"/"${values[2]}"
    fi

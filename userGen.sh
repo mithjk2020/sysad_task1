@@ -5,8 +5,10 @@ echo "admin:iamcore@2024" | sudo chpasswd
 sudo mkdir -p /home/admin/mentors /home/admin/mentees
 sudo cp "/home/mithra/mentorDetails.txt" "/home/admin/"
 sudo cp "/home/mithra/menteeDetails.txt" "/home/admin"
-sudo chmod 755 /home/admin/mentors
-sudo chmod 755 /home/admin/mentees
+sudo chmod -R 755 /home/admin/mentors
+sudo chmod -R 755 /home/admin/mentees
+sudo chown admin:admin /home/admin
+sudo chown admin:admin /home/admin/mentees
 sudo mkdir /home/admin/mentors/web /home/admin/mentors/app /home/admin/mentors/sysad
 create(){
   sudo useradd -m -d /home/admin/mentors/$1/"$men" "$men"
@@ -15,7 +17,7 @@ create(){
   echo "$men:deltaforce@2024" | sudo chpasswd
   sudo touch /home/admin/mentors/$1/"$men"/allocatedMentees.txt
   sudo touch /home/admin/mentors/$1/"$men"/cap.txt
-  sudo chmod 777 /home/admin/mentors/$1/"$men"/cap.txt
+  sudo chmod 777 /home/admin/mentors/$1/"$men"/{cap.txt,allocatedMentees.txt}
   echo "$cap" | sudo tee /home/admin/mentors/$1/"$men"/cap.txt > /dev/null
   sudo mkdir -p /home/admin/mentors/$1/"$men"/submittedTasks/task{1..3}
 }
@@ -31,6 +33,7 @@ do
    sudo touch /home/admin/mentees/"$name"/{domain_pref.txt,task_completed.txt,task_submitted.txt}
    sudo chmod 777 /home/admin/mentees/"$name"/.bashrc
    sudo chmod 777 /home/admin/mentees/"$name"/{domain_pref.txt,task_completed.txt,task_submitted.txt}
+   sudo chown "$name":"$name" /home/admin/mentees/"$name"/*
    sudo tee /home/admin/mentees/"$name"/task_submitted.txt > /dev/null <<EOF
    sysAd:
     Task1: n
@@ -75,9 +78,5 @@ do
    fi
 done < mentorDetails.txt
 sudo touch /home/admin/mentees_domain.txt
-if [ $? -eq 0 ]; then
- echo "created successfully"
-fi
-sudo chmod 777 /home/admin/mentees_domain.txt
-sudo chown -R admin:admin /home/admin
-sudo chmod -R 755 /home/admin
+sudo chmod 722 /home/admin/mentees_domain.txt
+sudo setfacl -Rm u:admin:rwx /home/admin/mentees /home/admin/mentors
