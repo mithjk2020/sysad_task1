@@ -37,22 +37,26 @@ for tasks in 1 2 3; do
   for domain in web app sysad; do
     domain_var="${domain}_submitted_task${tasks}"
     mentee_var="mentee_${domain}count"
-    var=$(( (${!domain_var} * 100) / ${!mentee_var} ))  # Used indirect variable reference
-    echo "${domain} domain task ${tasks} submissions % is $var."
+    if [[ ${!mentee_var} -ne 0 ]]; then
+     var=$(( (${!domain_var} * 100) / ${!mentee_var} ))  
+     echo "${domain} domain task ${tasks} submissions % is $var."
+    fi
   done
   total_var="task${tasks}total"
-  total=$(( (${!total_var} * 100) / mentee_count ))  # Used indirect variable reference
+  total=$(( (${!total_var} * 100) / mentee_count )) 
   echo "All domains task ${tasks} submissions % is $total."
 done
-
 
 last_run="/home/admin/last_run_timestamp.txt"
 current_timestamp=$(date +%s)
 last_run_timestamp=$(cat "$last_run" 2>/dev/null || echo 0)
 echo "$current_timestamp" > "$last_run"
 
-submitted_mentees=$(find /home/admin/mentees/*/*/task{1..3} -type d -newermt "@$last_run_timestamp" -exec bash -c 'echo ${1%/*/*/*}' _ {} \; | sort -u)
-home/admin/mentors/"$domain"/"$name"/"${line[0]}"/
+
+submitted_mentees=$(find /home/admin/mentees -path "*/task[1-3]" -type d -newermt "@$last_run_timestamp" -exec bash -c 'echo "${1%/*/*/*}"' _ {} \; | sort -u)
+
+mentor_path="/home/admin/mentors/$domain/$name"
+
 if [[ -z "$submitted_mentees" ]]; then
   echo "No mentees submitted tasks since the last run."
 else
