@@ -2,10 +2,7 @@
 sudo useradd -m -d /home/admin admin
 echo "admin:iamcore@2024" | sudo chpasswd
 sudo mkdir -p /home/admin/mentors /home/admin/mentees
-sudo cp "/home/mithra/mentorDetails.txt" "/home/admin/"
-sudo cp "/home/mithra/menteeDetails.txt" "/home/admin/"
 sudo chown -R admin:admin /home/admin/{mentees,mentors}
-sudo chown -R admin:admin /home/admin/{menteeDetails.txt,mentorDetails.txt}
 sudo chmod -R 755 /home/admin/{mentors,mentees}
 sudo mkdir -p /home/admin/mentors/web /home/admin/mentors/app /home/admin/mentors/sysad
 create(){
@@ -78,15 +75,3 @@ done < mentorDetails.txt
 sudo touch /home/admin/mentees_domain.txt
 sudo chmod 722 /home/admin/mentees_domain.txt
 
-for mentees in "/home/admin/mentees"/*; do sudo cp "/home/mithra/task/src/submitTask.sh" "$mentees/"; done
-for mentees in "/home/admin/mentees"/*; do sudo cp "/home/mithra/task/src/domainPref.sh" "$mentees/"; done
-for mentors in "/home/admin/mentors/web"/*; do sudo cp "/home/mithra/task/src/submitTask.sh" "$mentors/"; done
-for mentors in "/home/admin/mentors/app"/*; do sudo cp "/home/mithra/task/src/submitTask.sh" "$mentors/"; done
-for mentors in "/home/admin/mentors/sysad"/*; do sudo cp "/home/mithra/task/src/submitTask.sh" "$mentors/"; done
-sudo cp /home/mithra/task/src/mentorAllocation.sh /home/admin/
-sudo cp /home/mithra/task/src/displayStatus.sh /home/admin/
-for mentees in "/home/admin/mentees"/*; do sudo cp "/home/mithra/task/src/deRegister.sh" "$mentees/"; done
-for mentees in "/home/admin/mentees"/*; do sudo cp "/home/mithra/task/src/setQuiz_mentee.sh" "$mentees/"; done
-for mentors in "/home/admin/mentors/web"/*; do sudo cp "/home/mithra/task/src/setQuiz_mentor.sh" "$mentors/"; done
-for mentors in "/home/admin/mentors/app"/*; do sudo cp "/home/mithra/task/src/setQuiz_mentor.sh" "$mentors/"; done
-for mentors in "/home/admin/mentors/sysad"/*; do sudo cp "/home/mithra/task/src/setQuiz_mentor.sh" "$mentors/"; done
