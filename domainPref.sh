@@ -18,17 +18,23 @@ name=$(whoami)
      name1=${line[0]}
      if [ "$name" = "$name1" ]; then
         rollno=${line[1]}
-        echo "$rollno"
      fi
    done < /home/admin/menteeDetails.txt
    echo "'$name' '$rollno' '${values[0]}'=>'${values[1]}'=>'${values[2]}'" >>/home/admin/mentees_domain.txt
    echo "'$values[0]}'=>'${values[1]}'=>'$values[2]}'" > /home/admin/mentees/"$name"/domain_pref.txt
-   if [ -n "${values[0]}" ]; then
-    mkdir /home/admin/mentees/"$name"/"${values[0]}"
-   fi
-   if [ -n "${values[1]}" ]; then
-    mkdir /home/admin/mentees/"$name"/"${values[1]}"
-   fi
    if [ -n "${values[2]}" ]; then
+    echo "'$name' '$rollno' '${values[0]}'=>'${values[1]}'=>'${values[2]}'" >>/home/admin/mentees_domain.txt
+    echo "'${values[0]}'=>'${values[1]}'=>'$values[2]}'" > /home/admin/mentees/"$name"/domain_pref.txt
+    mkdir /home/admin/mentees/"$name"/"${values[0]}"
+    mkdir /home/admin/mentees/"$name"/"${values[1]}"
     mkdir /home/admin/mentees/"$name"/"${values[2]}"
+   elif [ -n "${values[1]}" ]; then
+    echo "'$name' '$rollno' '${values[0]}'=>'${values[1]}'" >>/home/admin/mentees_domain.txt
+    echo "'${values[0]}'=>'${values[1]}'" > /home/admin/mentees/"$name"/domain_pref.txt
+    mkdir /home/admin/mentees/"$name"/"${values[0]}"
+    mkdir /home/admin/mentees/"$name"/"${values[1]}"
+   elif [ -n "${values[0]}" ]; then
+    echo "'$name' '$rollno' '${values[0]}'" >>/home/admin/mentees_domain.txt
+    echo "'${values[0]}'" > /home/admin/mentees/"$name"/domain_pref.txt
+    mkdir /home/admin/mentees/"$name"/"${values[0]}"
    fi

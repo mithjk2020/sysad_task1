@@ -73,5 +73,5 @@ do
    fi
 done < mentorDetails.txt
 sudo touch /home/admin/mentees_domain.txt
-sudo chmod 722 /home/admin/mentees_domain.txt
+sudo chmod 766 /home/admin/mentees_domain.txt
 
