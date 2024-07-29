@@ -20,8 +20,6 @@ name=$(whoami)
         rollno=${line[1]}
      fi
    done < /home/admin/menteeDetails.txt
-   echo "'$name' '$rollno' '${values[0]}'=>'${values[1]}'=>'${values[2]}'" >>/home/admin/mentees_domain.txt
-   echo "'$values[0]}'=>'${values[1]}'=>'$values[2]}'" > /home/admin/mentees/"$name"/domain_pref.txt
    if [ -n "${values[2]}" ]; then
     echo "'$name' '$rollno' '${values[0]}'=>'${values[1]}'=>'${values[2]}'" >>/home/admin/mentees_domain.txt
     echo "'${values[0]}'=>'${values[1]}'=>'$values[2]}'" > /home/admin/mentees/"$name"/domain_pref.txt
