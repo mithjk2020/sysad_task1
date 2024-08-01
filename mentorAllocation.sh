@@ -1,61 +1,38 @@
 #!/bin/bash
-while IFS= read -r line
+while IFS=' ' read -r name rollno domains confirmation
 do
-  line=($line)
-  name=${line[0]}
-  rollno=${line[1]}
-  domains=${line[2]}
-  confirmation=${line[3]}
-  if echo "$confirmation" | grep -q "Mentors allocated"; then
+  # Skip if confirmation contains "Mentors"
+  if echo "$confirmation" | grep -q "Mentors"; then
     continue
-  else
-    # Check and assign mentors based on domains
-    if echo "$domains" | grep -q "web"; then
-      while true; do
-        mentor=$(ls -d "/home/admin/mentors/web"/*/ | shuf -n 1)
-        capleft=$(<"${mentor}cap.txt")
-        echo "Mentor: $mentor, Cap Left: $capleft"
-        if [[ "$capleft" -gt 0 ]]; then
-          sudo sh -c "echo '$name $rollno' >> ${mentor}allocatedMentees.txt"
-          cat "${mentor}allocatedMentees.txt"
-          capleft=$((capleft-1))
-          echo "$capleft" | sudo tee "${mentor}cap.txt" > /dev/null
-          sed -i "s/^$line/$line Mentors allocated/" /home/admin/mentees_domain.txt
-          break
-        fi
-      done
-    fi
-
-    if echo "$domains" | grep -q "app"; then
-      while true; do
-        mentor=$(ls -d "/home/admin/mentors/app"/*/ | shuf -n 1)
-        capleft=$(<"${mentor}cap.txt")
-        echo "Mentor: $mentor, Cap Left: $capleft"
-        if [[ "$capleft" -gt 0 ]]; then
-          sudo sh -c "echo '$name $rollno' >> ${mentor}allocatedMentees.txt"
-          cat "${mentor}allocatedMentees.txt"
-          capleft=$((capleft-1))
-          echo "$capleft" | sudo tee "${mentor}cap.txt" > /dev/null
-          sed -i "s/^$line/$line Mentors allocated/" /home/admin/mentees_domain.txt
-          break
-        fi
-      done
-    fi
-
-    if echo "$domains" | grep -q "sysad"; then
-      while true; do
-        mentor=$(ls -d "/home/admin/mentors/sysad"/*/ | shuf -n 1)
-        capleft=$(<"${mentor}cap.txt")
-        echo "Mentor: $mentor, Cap Left: $capleft"
-        if [[ "$capleft" -gt 0 ]]; then
-          sudo sh -c "echo '$name $rollno' >> ${mentor}allocatedMentees.txt"
-          cat "${mentor}allocatedMentees.txt"
-          capleft=$((capleft-1))
-          echo "$capleft" | sudo tee "${mentor}cap.txt" > /dev/null
-          sed -i "s/^$line.*/& Mentors allocated/" /home/admin/mentees_domain.txt
-          break
-        fi
-      done
-    fi
   fi
+
+  # Allocate mentors based on domains
+  for domain in web app sysad; do
+    if echo "$domains" | grep -q "$domain"; then
+      while true; do
+        mentor=$(ls -d "/home/admin/mentors/$domain"/*/ | shuf -n 1)
+        capfile="${mentor}cap.txt"
+        
+        if [ -f "$capfile" ]; then
+          capleft=$(<"$capfile")
+          echo "Mentor: $mentor, Cap Left: $capleft"
+
+          if [ "$capleft" -gt 0 ]; then
+            sudo sh -c "echo '$name $rollno' >> ${mentor}allocatedMentees.txt"
+            cat "${mentor}allocatedMentees.txt"
+            capleft=$((capleft-1))
+            echo "$capleft" | sudo tee "$capfile" > /dev/null
+            sed -i "/^$name $rollno $domains/c\\$name $rollno $domains Mentors allocated" /home/admin/mentees_domain.txt
+            break
+          else
+            echo "No capacity left for mentor $mentor"
+            break
+          fi
+        else
+          echo "Capacity file $capfile not found for mentor $mentor"
+          break
+        fi
+      done
+    fi
+  done
 done < /home/admin/mentees_domain.txt
