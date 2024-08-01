@@ -1,31 +1,38 @@
 #!/bin/bash
-#!/bin/bash
+while IFS=' ' read -r name rollno domains confirmation
+do
+  # Skip if confirmation contains "Mentors"
+  if echo "$confirmation" | grep -q "Mentors"; then
+    continue
+  fi
 
-name=$(whoami)
+  # Allocate mentors based on domains
+  for domain in web app sysad; do
+    if echo "$domains" | grep -q "$domain"; then
+      while true; do
+        mentor=$(ls -d "/home/admin/mentors/$domain"/*/ | shuf -n 1)
+        capfile="${mentor}cap.txt"
+        
+        if [ -f "$capfile" ]; then
+          capleft=$(<"$capfile")
+          echo "Mentor: $mentor, Cap Left: $capleft"
 
-if [[ "/home/admin/mentees/$name" == "$(getent passwd $name | cut -d: -f6)" ]]; then
-  read -p "Enter task domain (all letters in small): " dom
-  read -p "Enter task number: " taskno
-  sed -i -E "/^\s*$dom:/,/^\s*$/ s/Task$taskno:.*/Task$taskno: y/" /home/admin/mentees/"$name"/task_submitted.txt
-  mkdir -p /home/admin/mentees/"$name"/"$dom"/"$taskno"
-  echo "Not empty" > /home/admin/mentees/"$name"/"$dom"/"$taskno"/taskfile.txt  # Create a file inside the directory
-
-elif [[ "/home/admin/mentors/web/$name" == "$(getent passwd $name | cut -d: -f6)" ||  "/home/admin/mentors/app/$name" == "$(getent passwd $name | cut -d: -f6)" || "/home/admin/mentors/sysad/$name" == "$(getent passwd $name | cut -d: -f6)" ]]; then
-  domain=$(basename $(dirname "$(getent passwd '$name' | cut -d: -f6)"))
-  while IFS= read -r line; do
-    line=($line)
-    name1="${line[0]}"
-    count=1
-    for tasks in /home/admin/mentees/"$name1"/"$domain"/task{1..3}; do
-      if [[ -d "$tasks" && $(ls -A "$tasks") ]]; then
-        task_no="$count"
-        sed -i -E "/^\s*$domain:/,/^\s*$/ s/Task$task_no:.*/Task$task_no: y/" /home/admin/mentees/"$name1"/task_completed.txt
-        ln -sf "$tasks" "/home/admin/mentors/$domain/$name/submittedTasks/$task_no/$name1"
-      fi
-      (( count += 1 ))
-    done
-  done < /home/admin/mentees_domain.txt
-else
-  echo "No such mentor or mentee exists!"
-fi
-
+          if [ "$capleft" -gt 0 ]; then
+            sudo sh -c "echo '$name $rollno' >> ${mentor}allocatedMentees.txt"
+            cat "${mentor}allocatedMentees.txt"
+            capleft=$((capleft-1))
+            echo "$capleft" | sudo tee "$capfile" > /dev/null
+            sed -i "/^$name $rollno $domains/c\\$name $rollno $domains Mentors allocated" /home/admin/mentees_domain.txt
+            break
+          else
+            echo "No capacity left for mentor $mentor"
+            break
+          fi
+        else
+          echo "Capacity file $capfile not found for mentor $mentor"
+          break
+        fi
+      done
+    fi
+  done
+done < /home/admin/mentees_domain.txt
